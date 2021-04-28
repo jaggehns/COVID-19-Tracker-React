@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { MenuItem, FormControl, Select } from "@material-ui/core";
+import InfoBox from "./InfoBox";
 import "./App.css";
 
 function App() {
@@ -51,6 +52,12 @@ function App() {
             <MenuItem value="worldwide">Worldwide</MenuItem> */}
           </Select>
         </FormControl>
+      </div>
+
+      <div className="app__stats">
+        <InfoBox title="Coronavirus Cases" cases={1234} total={2000} />
+        <InfoBox title="Recovered" cases={1234} total={2000} />
+        <InfoBox title="Deaths" cases={1234} total={2000} />
       </div>
 
       {/*Header*/}
