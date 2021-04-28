@@ -12,12 +12,18 @@ import Table from "./Table";
 import { sortData } from "./utils";
 import "./App.css";
 import LineGraph from "./LineGraph";
+import "leaflet/dist/leaflet.css";
 
 function App() {
   const [countries, setCountries] = useState([]);
   const [country, setCountry] = useState("worldwide");
   const [countryInfo, setCountryInfo] = useState({});
   const [tableData, setTableData] = useState([]);
+  const [mapCenter, setMapCenter] = useState([34.80746, -40.4796]);
+  const [zoom, setZoom] = useState(3);
+  const [mapCountries, setMapCountries] = useState([]);
+  const [casesType, setCasesType] = useState("cases");
+  const [isLoading, setLoading] = useState(false);
 
   //https://disease.sh/v3/covid-19/countries
 
@@ -43,6 +49,7 @@ function App() {
 
           const sortedData = sortData(data);
           setTableData(sortedData);
+          setMapCountries(data);
           setCountries(countries);
         });
     };
@@ -64,12 +71,17 @@ function App() {
       .then((response) => response.json())
       .then((data) => {
         setCountry(countryCode);
-        //All of the data from the country response
         setCountryInfo(data);
+        setLoading(false);
+        // console.log([data.countryInfo.lat, data.countryInfo.long]);
+        countryCode === "worldwide"
+          ? setMapCenter([34.80746, -40.4796])
+          : setMapCenter([data.countryInfo.lat, data.countryInfo.long]);
+        setZoom(4);
       });
-  };
 
-  console.log("Country Info", countryInfo);
+    console.log(countryInfo);
+  };
 
   return (
     <div className="app">
@@ -118,7 +130,12 @@ function App() {
         {/*InfoBox*/}
 
         {/*Map*/}
-        <Map />
+        <Map
+          countries={mapCountries}
+          center={mapCenter}
+          zoom={zoom}
+          casesType={casesType}
+        />
       </div>
       <Card className="app__right">
         <CardContent>
