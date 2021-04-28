@@ -47,8 +47,8 @@ const options = {
   },
 };
 
-const buildChartData = (data, casesType = "cases") => {
-  const chartData = [];
+const buildChartData = (data, casesType) => {
+  let chartData = [];
   let lastDataPoint;
   for (let date in data.cases) {
     if (lastDataPoint) {
@@ -58,38 +58,45 @@ const buildChartData = (data, casesType = "cases") => {
       };
       chartData.push(newDataPoint);
     }
-    lastDataPoint = data["cases"][date];
+    lastDataPoint = data[casesType][date];
   }
   return chartData;
 };
 
-function LineGraph({ casesType = "cases" }) {
+function LineGraph({ casesType, ...props }) {
   const [data, setData] = useState({});
 
   useEffect(() => {
-    fetch("https://disease.sh/v3/covid-19/historical/all?lastdays=120")
-      .then((response) => response.json())
-      .then((data) => {
-        const chartData = buildChartData(data, "cases");
-        console.log(chartData);
-        setData(chartData);
-      });
-  }, []);
+    const fetchData = async () => {
+      await fetch("https://disease.sh/v3/covid-19/historical/all?lastdays=120")
+        .then((response) => {
+          return response.json();
+        })
+        .then((data) => {
+          let chartData = buildChartData(data, casesType);
+          setData(chartData);
+          console.log(chartData);
+          // buildChart(chartData);
+        });
+    };
+
+    fetchData();
+  }, [casesType]);
 
   return (
-    <div>
+    <div className={props.className}>
       {data?.length > 0 && (
         <Line
-          options={options}
           data={{
             datasets: [
               {
-                backgroundColor: "rgba(204, 16, 52, 0.5",
+                backgroundColor: "rgba(204, 16, 52, 0.5)",
                 borderColor: "#CC1034",
                 data: data,
               },
             ],
           }}
+          options={options}
         />
       )}
     </div>
@@ -97,5 +104,3 @@ function LineGraph({ casesType = "cases" }) {
 }
 
 export default LineGraph;
-
-///https://disease.sh/v3/covid-19/historical/all?lastdays=120
